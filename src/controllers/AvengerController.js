@@ -50,8 +50,23 @@ module.exports = {
 
     async destroy (req, res){
         try{
-            const avenger = await Avenger.findOneAndRemove(req.params.id);
-            res.status(200).send(avenger);
+            //const avenger = await Avenger.findOneAndRemove(req.params.id);
+            
+            const procurar = await Avenger.find().select('_id');
+
+            let i = 0;
+            let metade = [];
+
+            const tam = procurar.length % 2 == 0 ? procurar.length + 1 : procurar.length - 1;
+
+            while(i < tam / 2){
+                metade.push(procurar[Math.floor(Math.random() * procurar.length)]._id);
+                i++;
+            }
+
+            const avengers = await Avenger.deleteMany( { _id:{ $nin: metade} });
+
+            res.status(200).send(avengers);
         }
         catch(e){
             res.status(500).send({
